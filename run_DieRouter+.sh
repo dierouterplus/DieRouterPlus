@@ -9,7 +9,6 @@ Routing_Critical_Net="Dijkstra"
 Routing_Non_Critical_Net="Dijkstra"
 
 
-#Two_Stage_Reroute_Method="run_two_stage_reroute"
 Two_Stage_Reroute_Method="run_two_stage_reroute_sink"
 Edge_Criticality_Metric="Max"
 Patience="2"
@@ -53,11 +52,8 @@ do
     fi
 
     # Run Convex Optimization
-    if [ "$Two_Stage_Reroute_Method" == "run_two_stage_reroute" ]; then
-      identifier_1_token=Two-Stage-Reroute-${Edge_Criticality_Metric}
-    elif [ "$Two_Stage_Reroute_Method" == "run_two_stage_reroute_sink" ]; then
-      identifier_1_token=Two-Stage-Reroute-Sink-${Edge_Criticality_Metric}-zero
-    fi
+    identifier_1_token=Two-Stage-Reroute-Sink-${Edge_Criticality_Metric}-zero
+
 
     cd ../..
     cd ${ContTDMOpt_Script_Dir} || { echo "Cannot switch to ${ContTDMOpt_Script_Dir}. Skip $testcase."; continue; }

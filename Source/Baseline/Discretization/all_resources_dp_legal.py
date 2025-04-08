@@ -97,7 +97,7 @@ class AllResourcesDPLegal(DPLegalMixIn):
         cost_array_0, assignment_0 = worker(tasks[0])
         cost_array_1, assignment_1 = worker(tasks[1])
 
-        n_wire = tasks[0].n_wire
+        n_wire = tasks[0].n_wire if tasks[0] is not None else tasks[1].n_wire
 
         if cost_array_0 is not None and cost_array_1 is not None:
             """
@@ -116,14 +116,15 @@ class AllResourcesDPLegal(DPLegalMixIn):
 
         n_wire_1 = n_wire - n_wire_0
 
-        net_to_discrete_tdm_ratio_task_0 = tasks[0].discretizer.construct_assignment_scheme(n_wire_0)
-        net_to_discrete_tdm_ratio_task_1 = tasks[1].discretizer.construct_assignment_scheme(n_wire_1)
+        net_to_discrete_tdm_ratio_task_0 = tasks[0].discretizer.construct_assignment_scheme(n_wire_0) if tasks[0] is not None else None
 
-        row_idx_0 = self.directed_tdm_edge_to_row_idx[tasks[0].directed_tdm_edge]
-        row_idx_1 = self.directed_tdm_edge_to_row_idx[tasks[1].directed_tdm_edge]
+        net_to_discrete_tdm_ratio_task_1 = tasks[1].discretizer.construct_assignment_scheme(n_wire_1) if tasks[1] is not None else None
 
-        res_array_0 = self.gen_res_array(tasks[0].directed_tdm_edge, net_to_discrete_tdm_ratio_task_0)
-        res_array_1 = self.gen_res_array(tasks[1].directed_tdm_edge, net_to_discrete_tdm_ratio_task_1)
+        row_idx_0 = self.directed_tdm_edge_to_row_idx[tasks[0].directed_tdm_edge] if tasks[0] is not None else None
+        row_idx_1 = self.directed_tdm_edge_to_row_idx[tasks[1].directed_tdm_edge] if tasks[1] is not None else None
+
+        res_array_0 = self.gen_res_array(tasks[0].directed_tdm_edge, net_to_discrete_tdm_ratio_task_0) if tasks[0] is not None else None
+        res_array_1 = self.gen_res_array(tasks[1].directed_tdm_edge, net_to_discrete_tdm_ratio_task_1) if tasks[1] is not None else None
 
         return row_idx_0, row_idx_1, res_array_0, res_array_1
 

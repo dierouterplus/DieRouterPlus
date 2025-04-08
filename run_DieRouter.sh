@@ -1,14 +1,14 @@
 #!/bin/bash
 
-Scripts_Dir="./Baseline_Scripts"
-ContTDMOpt_Script_Dir="./ContTDMOpt_Scripts"
+Scripts_Dir="./Source/Baseline_Scripts"
+ContTDMOpt_Script_Dir="./Source/ContTDMOpt_Scripts"
 
 N_Pins_Gap_Factor="60"
+# Routing_Critical_Net : "Dijkstra"/"MST"/"SMT"
 Routing_Critical_Net="MST"
 Routing_Non_Critical_Net="Dijkstra"
 
 
-#Two_Stage_Reroute_Method="run_two_stage_reroute"
 Two_Stage_Reroute_Method="run_two_stage_reroute_sink"
 Edge_Criticality_Metric="Max"
 Patience="2"
@@ -20,7 +20,7 @@ significance_threshold="1"
 legalization_token="DP-Legalization-Baseline"
 
 
-for i in {10..10}
+for i in {1..5}
 do
     testcase="testcase$i"
 
@@ -30,7 +30,7 @@ do
 
     # Run initial routing
     python run_hybrid_initial_routing.py \
-        --testcase_dir "../Data/$testcase" \
+        --testcase_dir "../../Data/$testcase" \
         --critical_net ${Routing_Critical_Net} \
         --non_critical_net ${Routing_Non_Critical_Net} \
         --n_pins_gap_factor ${N_Pins_Gap_Factor}
@@ -42,7 +42,7 @@ do
 
     # Run two stage reroute
     python ${Two_Stage_Reroute_Method}.py \
-    --up_dir ../Res/Baseline/$testcase \
+    --up_dir ../../Res/$testcase \
     --identifier_0_n_pins_gap_factor ${N_Pins_Gap_Factor} \
     --identifier_0_token Hybrid-Initial-Routing-${Routing_Critical_Net}-${Routing_Non_Critical_Net} \
     --edge_criticality_metric ${Edge_Criticality_Metric} \
@@ -55,14 +55,11 @@ do
     fi
 
     # Solve Continuous TDM Ratios
-    if [ "$Two_Stage_Reroute_Method" == "run_two_stage_reroute" ]; then
-      identifier_1_token=Two-Stage-Reroute-${Edge_Criticality_Metric}
-    elif [ "$Two_Stage_Reroute_Method" == "run_two_stage_reroute_sink" ]; then
-      identifier_1_token=Two-Stage-Reroute-Sink-${Edge_Criticality_Metric}-zero
-    fi
+    identifier_1_token=Two-Stage-Reroute-Sink-${Edge_Criticality_Metric}-zero
+
 
     python run_conti_tdm_solver.py \
-    --up_dir ../Res/Baseline/$testcase \
+    --up_dir ../../Res/$testcase \
     --significance_threshold ${significance_threshold} \
     --identifier_0_n_pins_gap_factor ${N_Pins_Gap_Factor} \
     --identifier_0_token Hybrid-Initial-Routing-${Routing_Critical_Net}-${Routing_Non_Critical_Net} \
@@ -70,9 +67,9 @@ do
 
 
     python run_legalization.py \
-    --up_dir ../Res/Baseline/$testcase \
+    --up_dir ../../Res/$testcase \
     --enable_multiprocessing \
-    --n_process 6 \
+    --n_process 10 \
     --token ${legalization_token} \
     --identifier_0_n_pins_gap_factor ${N_Pins_Gap_Factor} \
     --identifier_0_token Hybrid-Initial-Routing-${Routing_Critical_Net}-${Routing_Non_Critical_Net} \
@@ -80,7 +77,7 @@ do
     --identifier_2_token "Conti-TDM-Ratio-Baseline"
 
     echo "Finish $testcase"
-    cd ..
+    cd ../..
     echo "-----------------------------"
 done
 
